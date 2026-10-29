@@ -1,0 +1,18 @@
+name: Prender Aternos
+
+on:
+  workflow_dispatch: # Te permite darle a un botón "Run workflow" manualmente en GitHub
+  repository_dispatch:
+    types: [prender-servidor]
+
+jobs:
+  prender:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ejecutar encendido
+        run: |
+          # Acá le pegamos directo a la API de Aternos con tus cookies o credenciales
+          echo "Mandando señal para prender el server..."
+          curl -X GET "https://aternos.org/ajax/server/start?access-credits=false&acceptEula=true" \
+            -H "Cookie: VFmDe5sji3IahN68t1yuspu1HRs32gjldMYm4x7QJPGhAhlKX21viOU8libNwveu5UltPaQdrcVMzy7PEgk1wVVaHgn13GbcGRD0" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
