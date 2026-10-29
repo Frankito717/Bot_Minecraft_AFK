@@ -1,26 +1,30 @@
-const mineflayer = require('mineflayer');
+const net = require('net');
 
-function createBot() {
-    const bot = mineflayer.createBot({
-        host: 'Losantipala3000.aternos.me',
-        port: 25839,
-        username: 'ANTIPALABOT',
-        version: false, // Dejalo en false para que intente negociar el protocolo crossplay
-        skipValidation: true // Saltea validaciones estrictas que rompen con Geyser
+const HOST = 'Losantipala3000.aternos.me';
+const PORT = 25839;
+
+function mantenerConexion() {
+    console.log('[TCP] Conectando al servidor...');
+    const client = new net.Socket();
+
+    client.connect(PORT, HOST, () => {
+        console.log('[TCP] ¡Conexión establecida! Manteniendo el puerto vivo...');
+        
+        // Manda un ping falso cada 20 segundos para que Aternos no crea que hay inactividad
+        setInterval(() => {
+            client.write(Buffer.from([0x00])); 
+        }, 20000);
     });
 
-    bot.on('spawn', () => {
-        console.log('[NPC] El bot apareció correctamente en el mapa.');
+    client.on('close', () => {
+        console.log('[TCP] Conexión cerrada. Reconectando en 5 segundos...');
+        setTimeout(mantenerConexion, 5000);
     });
 
-    bot.on('end', (reason) => {
-        console.log(`[NPC] Desconectado por: ${reason}. Reconectando en 10 segundos...`);
-        setTimeout(createBot, 10000);
-    });
-
-    bot.on('error', (err) => {
-        console.log('[NPC] Error:', err);
+    client.on('error', (err) => {
+        console.log('[TCP] Error:', err.message);
+        client.destroy();
     });
 }
 
-createBot();
+mantenerConexion();
